@@ -14,7 +14,8 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
-import { logout, logoutBusiness, searchBusinesses } from '../actions/authActions';
+import {logout} from '../actions/authActions'
+import {  logoutBusiness, searchBusinesses } from '../actions/businessAction';
 import Cookies from 'js-cookie';
 
 const Navbar = () => {
