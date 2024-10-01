@@ -1,55 +1,65 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faUserPlus, faUserTie, faSignInAlt, faSignOutAlt, faUserCircle, faStar, faBars, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { 
+  faSearch, 
+  faUserPlus, 
+  faUserTie, 
+  faSignInAlt, 
+  faSignOutAlt, 
+  faUserCircle, 
+  faStar, 
+  faBars, 
+  faTimes 
+} from '@fortawesome/free-solid-svg-icons';
 import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
-import { logout } from '../actions/authActions';
-import { logoutBusiness } from '../actions/businessAction';
-import { searchBusinesses } from '../actions/businessAction';
+import { logout, logoutBusiness, searchBusinesses } from '../actions/authActions';
 import Cookies from 'js-cookie';
 
 const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isBusinessDropdownOpen, setIsBusinessDropdownOpen] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); // State for mobile menu toggle
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  
   const navigate = useNavigate();
-  const location = useLocation();
   const dispatch = useDispatch();
   const dropdownRef = useRef(null);
-
+  
+  // Determine if users are logged in based on cookies
   const isUserLoggedIn = !!Cookies.get('accessToken');
   const isBusinessLoggedIn = !!Cookies.get('refreshToken');
 
+  // Handle search submission
   const handleSearch = async (e) => {
     e.preventDefault();
     const results = await dispatch(searchBusinesses(searchQuery));
+
     if (results.length > 0) {
       navigate('/business-listing', { state: { results } });
     } else {
-      navigate('/');
       toast.info('No results found, please try another search.');
+      navigate('/');
     }
   };
 
+  // Toggle business dropdown visibility
   const toggleBusinessDropdown = () => {
-    setIsBusinessDropdownOpen(!isBusinessDropdownOpen);
+    setIsBusinessDropdownOpen(prev => !prev);
   };
 
+  // Handle user logout
   const handleLogout = () => {
     dispatch(logout());
     toast.success('You have logged out successfully!');
-    setTimeout(() => {
-      navigate('/');
-    }, 2000);
+    setTimeout(() => navigate('/'), 2000);
   };
 
+  // Handle business logout
   const handleBusinessLogout = () => {
     dispatch(logoutBusiness());
     toast.success('Business logged out successfully!');
-    setTimeout(() => {
-      navigate('/');
-    }, 2000);
+    setTimeout(() => navigate('/'), 2000);
   };
 
   // Close dropdown when clicking outside
@@ -61,20 +71,16 @@ const Navbar = () => {
     };
 
     document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [dropdownRef]);
 
   return (
     <nav className="bg-gray-900 w-full z-50 p-4 shadow-lg">
       <div className="container mx-auto">
+
         {/* Desktop and Tablet Navbar */}
         <div className="hidden md:flex items-center justify-between">
-          {/* Logo */}
-          <Link to="/" className="text-3xl font-bold text-white hover:text-blue-400 transition duration-300">
-            Lorley
-          </Link>
+          <Link to="/" className="text-3xl font-bold text-white hover:text-blue-400 transition duration-300">Lorley</Link>
 
           {/* Search bar */}
           <form onSubmit={handleSearch} className="flex-grow mx-8 max-w-lg flex items-center">
@@ -99,36 +105,33 @@ const Navbar = () => {
               <>
                 <li>
                   <Link to="/login" className="text-white hover:text-blue-400 transition duration-300">
-                    <FontAwesomeIcon icon={faSignInAlt} className="mr-2" />
-                    Login
+                    <FontAwesomeIcon icon={faSignInAlt} className="mr-2" />Login
                   </Link>
                 </li>
                 <li>
                   <Link to="/register" className="text-white hover:text-blue-400 transition duration-300">
-                    <FontAwesomeIcon icon={faUserPlus} className="mr-2" />
-                    Register
+                    <FontAwesomeIcon icon={faUserPlus} className="mr-2" />Register
                   </Link>
                 </li>
               </>
             )}
+
+            {/* User Logged In */}
             {isUserLoggedIn && (
               <>
                 <li>
                   <Link to="/profile" className="text-white hover:text-blue-400 transition duration-300">
-                    <FontAwesomeIcon icon={faUserCircle} className="mr-2" />
-                    Profile
+                    <FontAwesomeIcon icon={faUserCircle} className="mr-2" />Profile
                   </Link>
                 </li>
                 <li>
                   <Link to="/business/review" className="text-white hover:text-blue-400 transition duration-300">
-                    <FontAwesomeIcon icon={faStar} />
-                    Add Review
+                    <FontAwesomeIcon icon={faStar} />Add Review
                   </Link>
                 </li>
                 <li>
                   <button onClick={handleLogout} className="text-white hover:text-blue-400 transition duration-300">
-                    <FontAwesomeIcon icon={faSignOutAlt} className="mr-2" />
-                    Logout
+                    <FontAwesomeIcon icon={faSignOutAlt} className="mr-2" />Logout
                   </button>
                 </li>
               </>
@@ -141,76 +144,57 @@ const Navbar = () => {
                 className={`text-white hover:text-blue-400 transition duration-300 flex items-center ${isBusinessDropdownOpen ? 'font-bold' : ''}`}
               >
                 Business
-                <svg
-                  className="w-4 h-4 ml-1"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M19 9l-7 7-7-7"
-                  ></path>
-                </svg>
+                <FontAwesomeIcon icon={isBusinessDropdownOpen ? faTimes : faBars} className="ml-1" />
               </button>
               {isBusinessDropdownOpen && (
                 <ul className="absolute bg-white text-gray-800 right-0 mt-2 shadow-lg rounded-lg overflow-hidden w-48">
-                  {!isBusinessLoggedIn && (
+                  {!isBusinessLoggedIn ? (
                     <>
                       <li>
                         <Link
                           to="/business/register"
-                          className="block px-4 py-2 hover:bg-gray-100 flex items-center space-x-2"
+                          className="block px-4 py-2 hover:bg-gray-100 flex items-center"
                           onClick={() => setIsBusinessDropdownOpen(false)}
                         >
-                          <FontAwesomeIcon icon={faUserPlus} />
-                          <span>Register Business</span>
+                          <FontAwesomeIcon icon={faUserPlus} />Register Business
                         </Link>
                       </li>
                       <li>
                         <Link
                           to="/business/login"
-                          className="block px-4 py-2 hover:bg-gray-100 flex items-center space-x-2"
+                          className="block px-4 py-2 hover:bg-gray-100 flex items-center"
                           onClick={() => setIsBusinessDropdownOpen(false)}
                         >
-                          <FontAwesomeIcon icon={faSignInAlt} />
-                          <span>Login to Business</span>
+                          <FontAwesomeIcon icon={faSignInAlt} />Login to Business
                         </Link>
                       </li>
                     </>
-                  )}
-                  {isBusinessLoggedIn && (
+                  ) : (
                     <>
                       <li>
                         <Link
                           to="/business/dashboard"
-                          className="block px-4 py-2 hover:bg-gray-100 flex items-center space-x-2"
+                          className="block px-4 py-2 hover:bg-gray-100 flex items-center"
                           onClick={() => setIsBusinessDropdownOpen(false)}
                         >
-                          <FontAwesomeIcon icon={faUserTie} aria-hidden="true" />
-                          <span>Business Dashboard</span>
+                          <FontAwesomeIcon icon={faUserTie} aria-hidden="true" />Business Dashboard
                         </Link>
                       </li>
                       <li>
                         <Link
                           to="/business/profile"
-                          className="block px-4 py-2 hover:bg-gray-100 flex items-center space-x-2"
+                          className="block px-4 py-2 hover:bg-gray-100 flex items-center"
                           onClick={() => setIsBusinessDropdownOpen(false)}
                         >
-                          <FontAwesomeIcon icon={faUserCircle} />
-                          <span>Business Profile</span>
+                          <FontAwesomeIcon icon={faUserCircle} />Business Profile
                         </Link>
                       </li>
                       <li>
                         <button
                           onClick={handleBusinessLogout}
-                          className="block w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center space-x-2"
+                          className="block w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center"
                         >
-                          <FontAwesomeIcon icon={faSignOutAlt} className="text-red-500" />
-                          <span className="text-red-500">Logout</span>
+                          <FontAwesomeIcon icon={faSignOutAlt} className="text-red-500" />Logout
                         </button>
                       </li>
                     </>
@@ -223,34 +207,21 @@ const Navbar = () => {
 
         {/* Mobile Navbar */}
         <div className="flex md:hidden items-center justify-between">
-          <Link to="/" className="text-3xl font-bold text-white">
-            Lorley
-          </Link>
-
-          {/* Hamburger menu for mobile */}
-          <button
-            className="text-white"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
+          <Link to="/" className="text-3xl font-bold text-white">Lorley</Link>
+          <button className="text-white" onClick={() => setIsMobileMenuOpen(prev => !prev)}>
             <FontAwesomeIcon icon={isMobileMenuOpen ? faTimes : faBars} size="lg" />
           </button>
         </div>
 
-        {/* Mobile Menu (Sliding from the left) */}
-        {/* Mobile Menu (Sliding from the left) */}
+        {/* Mobile Menu */}
         <div className={`fixed top-0 left-0 h-full bg-gray-900 z-50 transform ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 w-64`}>
           <div className="flex flex-col p-4 space-y-4">
-            <button
-              className="self-end text-white"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
+            <button className="self-end text-white" onClick={() => setIsMobileMenuOpen(false)}>
               <FontAwesomeIcon icon={faTimes} size="lg" />
             </button>
 
             {/* Logo */}
-            <Link to="/" className="text-3xl font-bold text-white">
-              Lorley
-            </Link>
+            <Link to="/" className="text-3xl font-bold text-white">Lorley</Link>
 
             {/* Search bar */}
             <form onSubmit={handleSearch} className="mt-4 flex">
@@ -262,8 +233,8 @@ const Navbar = () => {
                 className="border border-gray-400 rounded-lg py-2 px-4 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <button
-                type="submit"
-                className="bg-blue-600 text-white rounded-lg px-4 py-2 ml-2 hover:bg-blue-700 transition duration-300"
+              type="submit"
+              className="bg-blue-600 text-white rounded-lg px-4 py-2 ml-2 hover:bg-blue-700 transition duration-300"
               >
                 <FontAwesomeIcon icon={faSearch} />
               </button>
@@ -276,14 +247,12 @@ const Navbar = () => {
                 <>
                   <li>
                     <Link to="/login" className="text-white hover:text-blue-400 transition duration-300">
-                      <FontAwesomeIcon icon={faSignInAlt} className="mr-2" />
-                      Login
+                      <FontAwesomeIcon icon={faSignInAlt} className="mr-2" />Login
                     </Link>
                   </li>
                   <li>
                     <Link to="/register" className="text-white hover:text-blue-400 transition duration-300">
-                      <FontAwesomeIcon icon={faUserPlus} className="mr-2" />
-                      Register
+                      <FontAwesomeIcon icon={faUserPlus} className="mr-2" />Register
                     </Link>
                   </li>
                 </>
@@ -292,20 +261,17 @@ const Navbar = () => {
                 <>
                   <li>
                     <Link to="/profile" className="text-white hover:text-blue-400 transition duration-300">
-                      <FontAwesomeIcon icon={faUserCircle} className="mr-2" />
-                      Profile
+                      <FontAwesomeIcon icon={faUserCircle} className="mr-2" />Profile
                     </Link>
                   </li>
                   <li>
                     <Link to="/business/review" className="text-white hover:text-blue-400 transition duration-300">
-                      <FontAwesomeIcon icon={faStar} />
-                      Add Review
+                      <FontAwesomeIcon icon={faStar} />Add Review
                     </Link>
                   </li>
                   <li>
                     <button onClick={handleLogout} className="text-white hover:text-blue-400 transition duration-300">
-                      <FontAwesomeIcon icon={faSignOutAlt} className="mr-2" />
-                      Logout
+                      <FontAwesomeIcon icon={faSignOutAlt} className="mr-2" />Logout
                     </button>
                   </li>
                 </>
@@ -317,14 +283,12 @@ const Navbar = () => {
             <ul className="flex flex-col space-y-4">
               <li>
                 <Link to="/business/register" className="text-white hover:text-blue-400 transition duration-300">
-                  <FontAwesomeIcon icon={faUserPlus} className="mr-2" />
-                  Register Business
+                  <FontAwesomeIcon icon={faUserPlus} className="mr-2" />Register Business
                 </Link>
               </li>
               <li>
                 <Link to="/business/login" className="text-white hover:text-blue-400 transition duration-300">
-                  <FontAwesomeIcon icon={faSignInAlt} className="mr-2" />
-                  Login to Business
+                  <FontAwesomeIcon icon={faSignInAlt} className="mr-2" />Login to Business
                 </Link>
               </li>
             </ul>
