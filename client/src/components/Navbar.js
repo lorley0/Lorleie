@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faSearch, 
@@ -14,8 +14,8 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
-import {logout} from '../actions/authActions'
-import {  logoutBusiness, searchBusinesses } from '../actions/businessAction';
+import { logout } from '../actions/authActions';
+import { logoutBusiness, searchBusinesses } from '../actions/businessAction';
 import Cookies from 'js-cookie';
 
 const Navbar = () => {
@@ -27,11 +27,9 @@ const Navbar = () => {
   const dispatch = useDispatch();
   const dropdownRef = useRef(null);
   
-  // Determine if users are logged in based on cookies
   const isUserLoggedIn = !!Cookies.get('accessToken');
   const isBusinessLoggedIn = !!Cookies.get('refreshToken');
 
-  // Handle search submission
   const handleSearch = async (e) => {
     e.preventDefault();
     const results = await dispatch(searchBusinesses(searchQuery));
@@ -44,26 +42,22 @@ const Navbar = () => {
     }
   };
 
-  // Toggle business dropdown visibility
   const toggleBusinessDropdown = () => {
     setIsBusinessDropdownOpen(prev => !prev);
   };
 
-  // Handle user logout
   const handleLogout = () => {
     dispatch(logout());
     toast.success('You have logged out successfully!');
     setTimeout(() => navigate('/'), 2000);
   };
 
-  // Handle business logout
   const handleBusinessLogout = () => {
     dispatch(logoutBusiness());
     toast.success('Business logged out successfully!');
     setTimeout(() => navigate('/'), 2000);
   };
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -117,7 +111,6 @@ const Navbar = () => {
               </>
             )}
 
-            {/* User Logged In */}
             {isUserLoggedIn && (
               <>
                 <li>
@@ -234,8 +227,8 @@ const Navbar = () => {
                 className="border border-gray-400 rounded-lg py-2 px-4 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <button
-              type="submit"
-              className="bg-blue-600 text-white rounded-lg px-4 py-2 ml-2 hover:bg-blue-700 transition duration-300"
+                type="submit"
+                className="bg-blue-600 text-white rounded-lg px-4 py-2 ml-2 hover:bg-blue-700 transition duration-300"
               >
                 <FontAwesomeIcon icon={faSearch} />
               </button>
@@ -244,7 +237,7 @@ const Navbar = () => {
             {/* User Section */}
             <h2 className="text-lg text-white font-semibold mt-6">User</h2>
             <ul className="flex flex-col space-y-4">
-              {!isUserLoggedIn && (
+              {!isUserLoggedIn ? (
                 <>
                   <li>
                     <Link to="/login" className="text-white hover:text-blue-400 transition duration-300">
@@ -257,8 +250,7 @@ const Navbar = () => {
                     </Link>
                   </li>
                 </>
-              )}
-              {isUserLoggedIn && (
+              ) : (
                 <>
                   <li>
                     <Link to="/profile" className="text-white hover:text-blue-400 transition duration-300">

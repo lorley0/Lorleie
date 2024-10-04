@@ -4,7 +4,7 @@ import BusinessListing from '../pages/business/BusinessListing';
 import { useDispatch, useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUtensils, faTshirt, faMedkit, faShoppingCart } from '@fortawesome/free-solid-svg-icons';
-import { fetchCategories } from '../actions/categoryActions'; 
+import { fetchCategories } from '../actions/categoryActions';
 import { toast } from 'react-toastify';
 
 const HomePage = () => {
@@ -22,14 +22,6 @@ const HomePage = () => {
   useEffect(() => {
     dispatch(fetchCategories());
   }, [dispatch]);
-
-  // Mapping categories to icons
-  const categoryIcons = {
-    Food: faUtensils,
-    Clothing: faTshirt,
-    Medicine: faMedkit,
-    Grocery: faShoppingCart,
-  };
 
   // Smooth scrolling to business listing
   const handleExploreClick = () => {
