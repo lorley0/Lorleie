@@ -1,13 +1,13 @@
 const asyncHandler = require('express-async-handler');
-const Category = require('../models/Category'); // Import the Category model
+const Category = require('../models/category'); // Import the Category model
 
 // Register a new category
 exports.addCategory = asyncHandler(async (req, res) => {
-    const { name , description} = req.body;
+    const { name, description } = req.body;
 
-    // Check if the required field is provided
+    // Check if the required fields are provided
     if (!name || !description) {
-        return res.status(400).json({ message: 'name and description is required.' });
+        return res.status(400).json({ message: 'Name and description are required.' });
     }
 
     // Check if the category already exists
@@ -19,16 +19,15 @@ exports.addCategory = asyncHandler(async (req, res) => {
     // Create a new category
     const newCategory = new Category({
         name,
-        description
+        description,
     });
 
     await newCategory.save();
     res.status(201).json({
         message: 'Category created successfully!',
-        newCategory// Optionally return the created category
+        newCategory, // Optionally return the created category
     });
 });
-
 
 // Fetch all categories
 exports.fetchAllCategories = asyncHandler(async (req, res) => {
@@ -52,5 +51,3 @@ exports.fetchAllCategories = asyncHandler(async (req, res) => {
         });
     }
 });
-
-
