@@ -4,13 +4,12 @@ import { registerUser as register } from '../../actions/authActions';
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { FaEye, FaEyeSlash } from 'react-icons/fa'; // Import eye icons for password visibility
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const RegisterPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // State to manage form data and visibility of passwords
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -20,13 +19,11 @@ const RegisterPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // Handle input change for the form
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
 
-  // Validate email format using regex
   const validateInput = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -37,26 +34,22 @@ const RegisterPage = () => {
     return true;
   };
 
-  // Handle form submission
   const submitHandler = async (e) => {
     e.preventDefault();
 
-    // Validate input before submission
     if (!validateInput()) return;
 
-    // Check if passwords match
     if (formData.password !== confirmPassword) {
       toast.error('Passwords do not match');
       return;
     }
 
-    // Dispatch registration action
     const response = await dispatch(register(formData));
     if (response.success) {
       toast.success('Registration successful. Please verify your email.');
-      navigate('/verify-otp', { state: { email: formData.email } }); // Navigate to OTP verification
+      navigate('/verify-otp', { state: { email: formData.email } });
     } else {
-      toast.error('Registration failed. User may already exist.');
+      toast.error(response.message || 'Registration failed. User may already exist.');
     }
   };
 
@@ -65,7 +58,6 @@ const RegisterPage = () => {
       <ToastContainer />
       <h2 className="text-2xl font-bold mb-4">Create Your Account</h2>
       <form onSubmit={submitHandler} className="bg-white shadow-md rounded px-8 py-6 w-full max-w-md">
-        {/* Name Input */}
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2">Name:</label>
           <input
@@ -78,7 +70,6 @@ const RegisterPage = () => {
           />
         </div>
 
-        {/* Email Input */}
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2">Email:</label>
           <input
@@ -91,7 +82,6 @@ const RegisterPage = () => {
           />
         </div>
 
-        {/* Password Input */}
         <div className="mb-4 relative">
           <label className="block text-gray-700 text-sm font-bold mb-2">Password:</label>
           <div className="relative flex items-center">
@@ -112,7 +102,6 @@ const RegisterPage = () => {
           </div>
         </div>
 
-        {/* Confirm Password Input */}
         <div className="mb-4 relative">
           <label className="block text-gray-700 text-sm font-bold mb-2">Confirm Password:</label>
           <div className="relative flex items-center">
@@ -132,7 +121,6 @@ const RegisterPage = () => {
           </div>
         </div>
 
-        {/* Register Button */}
         <button
           type="submit"
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
@@ -140,8 +128,7 @@ const RegisterPage = () => {
           Register
         </button>
       </form>
-      
-      {/* Link to Login Page */}
+
       <p className="mt-4">
         Already have an account? <a href="/login" className="text-blue-500">Login here</a>
       </p>
